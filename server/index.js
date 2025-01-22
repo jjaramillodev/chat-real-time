@@ -1,13 +1,9 @@
 import { createClient } from '@libsql/client'
-import { config } from 'dotenv'
 import express from 'express'
 import logger from 'morgan'
 import { createServer } from 'node:http'
 import { Server } from 'socket.io'
-
-config()
-
-const port = process.env.PORT ?? 3000
+import { DB_TOKEN, DB_URL, PORT } from './config.js'
 
 const app = express()
 const server = createServer(app)
@@ -16,8 +12,8 @@ const io = new Server(server, {
 })
 
 const db = createClient({
-  url: 'libsql://saving-iron-monger-mayercodes.turso.io',
-  authToken: process.env.DB_TOKEN
+  url: DB_URL,
+  authToken: DB_TOKEN
 })
 await db.execute(`
   CREATE TABLE IF NOT EXISTS messages (
@@ -71,6 +67,6 @@ app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/client/index.html')
 })
 
-server.listen(port, () => {
-  console.log(`server running on port http://localhost:${port}`)
+server.listen(PORT, () => {
+  console.log(`server running on port ${PORT}`)
 })
